@@ -5,7 +5,6 @@ from fastapi.responses import JSONResponse
 
 from config.database import Session
 from publications.schemas.publication import Publication
-from publications.models.publication import Publication as PublicationModel
 from publications.service import PublicationService
 
 
