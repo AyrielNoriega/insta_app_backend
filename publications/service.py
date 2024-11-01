@@ -23,8 +23,13 @@ class PublicationService():
         return
 
 
-    def update_publication(self):
-        pass
+    def update_publication(self, id: int, data: Publication):
+        publication = self.db.query(PublicationModel).filter(PublicationModel.id == id).first()
+        publication.title = data.title
+        publication.content = data.content
+
+        self.db.commit()
+        return
 
 
     def delete_publication(self):

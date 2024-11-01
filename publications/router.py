@@ -43,3 +43,21 @@ def create_publication(publication: Publication):
         status_code=201,
         content="Publication created successfully"
     )
+
+
+@publication_router.put('/{id}', tags=["publications"], status_code=200, response_model=dict)
+def update_publication(id: int, publication: Publication):
+    db = Session()
+    result = PublicationService(db).get_publication_by_id(id)
+    if not result:
+        content = {"message": "Publication not found"}
+        status = 404
+    else:
+        PublicationService(db).update_publication(id, publication)
+        content = "Publication updated successfully"
+        status = 200
+
+    return JSONResponse(
+        status_code=status,
+        content=content
+    )
