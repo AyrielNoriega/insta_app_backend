@@ -11,6 +11,11 @@ class PublicationService():
         return result
 
 
+    def get_publication_by_id(self, id: int):
+        result = self.db.query(PublicationModel).filter(PublicationModel.id == id).first()
+        return result
+
+
     def create_publication(self, publication: Publication):
         new_publication = PublicationModel(**publication.model_dump())
         self.db.add(new_publication)

@@ -20,6 +20,19 @@ def get_publications():
     return JSONResponse(status_code=200, content=jsonable_encoder(result))
 
 
+@publication_router.get('/{id}', tags=["publications"], status_code=200, response_model=Publication)
+def get_publications(id: int):
+    db = Session()
+    result = PublicationService(db).get_publication_by_id(id)
+    if not result:
+        content = {"message": "Publication not found"}
+        status = 404
+    else:
+        content = result
+        status = 200
+    return JSONResponse(status_code=status, content=jsonable_encoder(content))
+
+
 @publication_router.post('/', tags=["publications"], status_code=201, response_model=dict)
 def create_publication(publication: Publication):
     db = Session()
