@@ -1,5 +1,6 @@
 from typing import List
 from fastapi import APIRouter
+from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 
 from config.database import Session
@@ -11,9 +12,11 @@ publication_router = APIRouter()
 
 
 
-@publication_router.get('/', tags=["publications"], response_model=List[Publication])
+@publication_router.get('/', tags=["publications"], status_code=200, response_model=List[Publication])
 def get_publications():
-    return {"Hello": "World"}
+    db = Session()
+    result = db.query(PublicationModel).all()
+    return JSONResponse(status_code=200, content=jsonable_encoder(result))
 
 
 @publication_router.post('/', tags=["publications"], status_code=201, response_model=dict)
