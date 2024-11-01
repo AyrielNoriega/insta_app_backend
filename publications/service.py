@@ -32,5 +32,9 @@ class PublicationService():
         return
 
 
-    def delete_publication(self):
-        pass
+    def delete_publication(self, id: int):
+        publication = self.db.query(PublicationModel).filter(PublicationModel.id == id).first()
+        self.db.delete(publication)
+        self.db.commit()
+        return
+
