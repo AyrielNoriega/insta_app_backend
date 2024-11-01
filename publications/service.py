@@ -37,4 +37,3 @@ class PublicationService():
         self.db.delete(publication)
         self.db.commit()
         return
-

@@ -63,8 +63,8 @@ def update_publication(id: int, publication: Publication):
     )
 
 
-@publication_router.delete('/{id}', tags=["publications"], status_code=204, response_model=dict)
-def delete_publication(id: int):
+@publication_router.delete('/{id}', tags=["publications"], status_code=204)
+def delete_publication(id: int) -> JSONResponse:
     db = Session()
     result = PublicationService(db).get_publication_by_id(id)
     if not result:
@@ -72,7 +72,7 @@ def delete_publication(id: int):
         status = 404
     else:
         PublicationService(db).delete_publication(id)
-        content = "Publication deleted successfully"
+        content = None
         status = 204
 
     return JSONResponse(
