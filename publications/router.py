@@ -9,6 +9,7 @@ from publications.service import PublicationService
 
 
 publication_router = APIRouter()
+publication_router.prefix = "/publications"
 
 
 
