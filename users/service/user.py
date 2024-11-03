@@ -1,7 +1,7 @@
 
 from users.models.user import User as UserModel
 from users.schemas.user import User, UserRegister
-from utils.security import get_password_hash
+from core.security import get_password_hash
 
 
 class UserService:

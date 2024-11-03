@@ -1,6 +1,5 @@
 from fastapi.security import OAuth2PasswordBearer
-from jwt import InvalidTokenError, encode, decode
-from datetime import datetime, timedelta, timezone
+from jwt import InvalidTokenError, decode
 from fastapi.encoders import jsonable_encoder
 from fastapi import Depends, HTTPException, status
 from typing import Annotated
@@ -8,7 +7,7 @@ from typing import Annotated
 from users.schemas.token import TokenData
 from users.schemas.user import User, UserInDB
 from users.service.user import UserService
-from utils.security import verify_password
+from core.security import verify_password
 from core import database
 from core.config import get_settings
 
@@ -25,24 +24,6 @@ def get_user(username: str):
     user_dict = jsonable_encoder(current_user)
     user = UserInDB(**user_dict, hashed_password=user_dict["password"])
     return user
-
-
-def create_access_token(
-    data: dict,
-    expires_delta: timedelta | None = None
-):
-    to_encode = data.copy()
-    if expires_delta:
-        expire = datetime.now(timezone.utc) + expires_delta
-    else:
-        expire = datetime.now(timezone.utc) + timedelta(minutes=15)
-    to_encode.update({"exp": expire})
-    encoded_jwt = encode(
-        to_encode,
-        settings.SECRET_KEY,
-        algorithm=settings.ALGORITHM
-    )
-    return encoded_jwt
 
 
 def authenticate_user(

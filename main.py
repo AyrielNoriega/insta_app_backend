@@ -10,6 +10,7 @@ from middlewares.error_handler import ErrorHandler
 from users.schemas.token import Token
 from users.schemas.user import User
 from users.service import auth
+from core.security import create_access_token
 from core.config import get_settings
 
 settings = get_settings()
@@ -44,7 +45,7 @@ async def login_for_access_token(
         )
 
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = auth.create_access_token(
+    access_token = create_access_token(
         data={"sub": user.username}, expires_delta=access_token_expires
     )
     return Token(access_token=access_token, token_type="bearer")
