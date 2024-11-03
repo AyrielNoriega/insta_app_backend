@@ -15,7 +15,7 @@ user_router.tags = ["users"]
 
 
 @user_router.post('/register', status_code=201, response_model=dict)
-async def register(user: UserRegister):
+async def register_user(user: UserRegister):
     db = Session()
     existing_user = UserService(db).get_user_by_email(user.email)
 
