@@ -1,6 +1,8 @@
+from typing import Optional
 from pydantic import BaseModel, Field
 
 class User(BaseModel):
+    id: Optional[int] = None
     name: str = Field(..., min_length=3, max_length=255)
     username: str = Field(..., min_length=3, max_length=255)
     email: str = Field(..., min_length=3, max_length=255)
@@ -12,6 +14,7 @@ class User(BaseModel):
                 {
                     "name": "ayriel noriega",
                     "email": "ayriel@gmail.com",
+                    "username": "ayriel",
                 }
             ]
         }

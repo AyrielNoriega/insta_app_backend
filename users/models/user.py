@@ -1,8 +1,8 @@
 
 
 from datetime import datetime
-
 from sqlalchemy import Boolean, Column, DateTime, Integer, String
+from sqlalchemy.orm import relationship
 
 from core.database import Base
 
@@ -16,5 +16,11 @@ class User(Base):
     email = Column(String(255), nullable=False, unique=True)
     password = Column(String(255), nullable=False)
     disabled = Column(Boolean, default=False)
+    publications = relationship(
+        "Publication",
+        back_populates="user",
+        cascade="all, delete-orphan"
+    )
+
     created_at = Column(DateTime, default=datetime.now())
     updated_at = Column(DateTime, default=datetime.now(), onupdate=datetime.now())

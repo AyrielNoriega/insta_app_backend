@@ -1,5 +1,6 @@
 from publications.models.publication import Publication as PublicationModel
 from publications.schemas.publication import Publication
+from users.schemas.user import User
 
 class PublicationService():
     def __init__(self, db) -> None:
@@ -16,8 +17,8 @@ class PublicationService():
         return result
 
 
-    def create_publication(self, publication: Publication):
-        new_publication = PublicationModel(**publication.model_dump())
+    def create_publication(self, publication: Publication, current_user: User):
+        new_publication = PublicationModel(**publication.model_dump(), user_id=current_user.id)
         self.db.add(new_publication)
         self.db.commit()
         return

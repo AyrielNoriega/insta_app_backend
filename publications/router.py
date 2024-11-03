@@ -1,26 +1,29 @@
-from typing import List
-from fastapi import APIRouter
+from typing import Annotated, List
+from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 
 from core.database import Session
-from publications.schemas.publication import Publication
+from publications.schemas.publication import Publication, PublicationInDb
 from publications.service import PublicationService
+from users.schemas.user import User
+from users.service import auth
 
 
 publication_router = APIRouter()
 publication_router.prefix = "/publications"
+publication_router.tags = ["publications"]
 
 
 
-@publication_router.get('/', tags=["publications"], status_code=200, response_model=List[Publication])
+@publication_router.get('/', status_code=200, response_model=List[Publication])
 def get_publications():
     db = Session()
     result = PublicationService(db).get_publications()
     return JSONResponse(status_code=200, content=jsonable_encoder(result))
 
 
-@publication_router.get('/{id}', tags=["publications"], status_code=200, response_model=Publication)
+@publication_router.get('/{id}', status_code=200, response_model=Publication)
 def get_publications(id: int):
     db = Session()
     result = PublicationService(db).get_publication_by_id(id)
@@ -33,11 +36,13 @@ def get_publications(id: int):
     return JSONResponse(status_code=status, content=jsonable_encoder(content))
 
 
-@publication_router.post('/', tags=["publications"], status_code=201, response_model=dict)
-def create_publication(publication: Publication):
+@publication_router.post('/', status_code=201, response_model=dict)
+def create_publication(
+    publication: Publication,
+    current_user: Annotated[User, Depends(auth.get_current_active_user)]
+):
     db = Session()
-    PublicationService(db).create_publication(publication)
-
+    PublicationService(db).create_publication(publication, current_user)
 
     return JSONResponse(
         status_code=201,
@@ -45,37 +50,59 @@ def create_publication(publication: Publication):
     )
 
 
-@publication_router.put('/{id}', tags=["publications"], status_code=200, response_model=dict)
-def update_publication(id: int, publication: Publication):
+@publication_router.put('/{id}', status_code=200, response_model=dict)
+def update_publication(
+    id: int,
+    current_publication: Publication,
+    current_user: Annotated[User, Depends(auth.get_current_active_user)]
+):
     db = Session()
-    result = PublicationService(db).get_publication_by_id(id)
-    if not result:
+    publication = PublicationService(db).get_publication_by_id(id)
+    if not publication:
         content = {"message": "Publication not found"}
-        status = 404
+        status_code = 404
     else:
-        PublicationService(db).update_publication(id, publication)
+        get_publication = PublicationInDb(**jsonable_encoder(publication))
+
+        if current_user.id != get_publication.user_id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You do not have permission to update this publication"
+            )
+        PublicationService(db).update_publication(id, current_publication)
         content = "Publication updated successfully"
-        status = 200
+        status_code = 200
 
     return JSONResponse(
-        status_code=status,
+        status_code=status_code,
         content=content
     )
 
 
-@publication_router.delete('/{id}', tags=["publications"], status_code=204)
-def delete_publication(id: int) -> JSONResponse:
+@publication_router.delete('/{id}', status_code=204)
+def delete_publication(
+    id: int,
+    current_user: Annotated[User, Depends(auth.get_current_active_user)]
+) -> JSONResponse:
     db = Session()
-    result = PublicationService(db).get_publication_by_id(id)
-    if not result:
+    publication = PublicationService(db).get_publication_by_id(id)
+
+    if not publication:
         content = {"message": "Publication not found"}
-        status = 404
+        status_code = 404
     else:
+        get_publication = PublicationInDb(**jsonable_encoder(publication))
+
+        if current_user.id != get_publication.user_id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You do not have permission to delete this publication"
+            )
         PublicationService(db).delete_publication(id)
         content = None
-        status = 204
+        status_code = 204
 
     return JSONResponse(
-        status_code=status,
+        status_code=status_code,
         content=content
     )

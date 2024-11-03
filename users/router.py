@@ -1,10 +1,12 @@
 
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException, status, Depends
 from fastapi.responses import JSONResponse
+from typing import Annotated
 
 from core.database import Session
 from users.schemas.user import User, UserRegister
 from users.service.user import UserService
+from users.service import auth
 
 user_router = APIRouter()
 user_router.prefix = "/users"
@@ -32,18 +34,27 @@ async def register(user: UserRegister):
 
 
 @user_router.put('/{id}', status_code=200, response_model=dict)
-async def update_user(id: int, user: User):
+async def update_user(id: int, user: User, current_user: Annotated[User, Depends(auth.get_current_active_user)]):
     db = Session()
+
+    # Verificar si el usuario autenticado es el mismo que el usuario que se está intentando actualizar
+    if current_user.id != id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You do not have permission to update this user"
+        )
+
     result = UserService(db).get_user_by_id(id)
+
     if not result:
         content = {"message": "User not found"}
-        status = 404
+        status_code = 404
     else:
         UserService(db).update_user(id, user)
         content = "User updated successfully"
-        status = 200
+        status_code = 200
 
     return JSONResponse(
-        status_code=status,
+        status_code=status_code,
         content=content
     )

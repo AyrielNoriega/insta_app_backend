@@ -15,3 +15,11 @@ class Publication(BaseModel):
             ]
         }
     }
+
+
+class PublicationInDb(Publication):
+    id: int
+    user_id: int
+    created_at: str
+    updated_at: str
+
