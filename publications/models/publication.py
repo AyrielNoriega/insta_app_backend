@@ -2,7 +2,7 @@
 from sqlalchemy import Column, DateTime, Integer, String
 from datetime import datetime
 
-from config.database import Base
+from core.database import Base
 
 class Publication(Base):
     __tablename__ = 'publications'

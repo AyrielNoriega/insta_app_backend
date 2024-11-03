@@ -3,7 +3,7 @@ from fastapi import APIRouter
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 
-from config.database import Session
+from core.database import Session
 from publications.schemas.publication import Publication
 from publications.service import PublicationService
 

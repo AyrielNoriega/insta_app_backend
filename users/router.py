@@ -2,20 +2,21 @@
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse
 
-from config.database import Session
+from core.database import Session
 from users.schemas.user import User, UserRegister
-from users.service import UserService
+from users.service.user import UserService
 
 user_router = APIRouter()
 user_router.prefix = "/users"
+user_router.tags = ["users"]
 
 
 
-@user_router.post('/register', tags=["users"], status_code=201, response_model=dict)
-def register(user: UserRegister):
+@user_router.post('/register', status_code=201, response_model=dict)
+async def register(user: UserRegister):
     db = Session()
     existing_user = UserService(db).get_user_by_email(user.email)
-    print("existing_user", not existing_user)
+
     if not existing_user:
         UserService(db).register(user)
         status_code=201
@@ -30,8 +31,8 @@ def register(user: UserRegister):
     )
 
 
-@user_router.put('/{id}', tags=["users"], status_code=200, response_model=dict)
-def update_user(id: int, user: User):
+@user_router.put('/{id}', status_code=200, response_model=dict)
+async def update_user(id: int, user: User):
     db = Session()
     result = UserService(db).get_user_by_id(id)
     if not result:
