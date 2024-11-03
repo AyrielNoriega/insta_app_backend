@@ -15,9 +15,11 @@ from core.config import get_settings
 
 settings = get_settings()
 
-app = FastAPI()
-app.title = "Insta Publications API"
-app.version = "0.0.1"
+app = FastAPI(
+    openapi_prefix=settings.API_VERSION,
+)
+app.title = settings.APP_NAME
+app.version = "1.0.0"
 app.add_middleware(ErrorHandler)
 
 
