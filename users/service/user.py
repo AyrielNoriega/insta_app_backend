@@ -1,4 +1,7 @@
 
+from fastapi.encoders import jsonable_encoder
+from publications.models.publication import Publication
+from publications.schemas.publication import PublicationResponse
 from users.models.user import User as UserModel
 from users.schemas.user import User, UserRegister
 from core.security import get_password_hash
@@ -47,3 +50,14 @@ class UserService:
 
         self.db.commit()
         return
+
+    def get_publication_by_username(self, username: str):
+        results = self.db.query(Publication).join(UserModel).filter(UserModel.username == username).all()
+        publications = []
+        for publication in results:
+            p = PublicationResponse(
+                **jsonable_encoder(publication),
+                author=publication.user.name
+            )
+            publications.append(p)
+        return publications

@@ -1,5 +1,6 @@
 
 from fastapi import APIRouter, HTTPException, status, Depends
+from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from typing import Annotated
 
@@ -59,3 +60,12 @@ async def update_user(id: int, user: User, current_user: Annotated[User, Depends
         status_code=status_code,
         content=content
     )
+
+
+@user_router.get('/{username}/publications', status_code=200)
+def get_publications_for_user(username: str):
+    db = Session()
+    result = UserService(db).get_publication_by_username(username)
+    if not result:
+        raise HTTPException(status_code=404, detail="Publications not found")
+    return JSONResponse(status_code=200, content=jsonable_encoder(result))

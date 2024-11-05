@@ -4,6 +4,7 @@ from sqlalchemy.orm import joinedload
 from publications.models.publication import Publication as PublicationModel
 from publications.schemas.publication import Publication, PublicationResponse
 from users.schemas.user import User
+from users.models.user import User as UserModel
 
 class PublicationService():
     def __init__(self, db) -> None:
