@@ -18,8 +18,9 @@ user_router.tags = ["users"]
 async def register_user(user: UserRegister):
     db = Session()
     existing_user = UserService(db).get_user_by_email(user.email)
+    existing_username = UserService(db).get_user_by_username(user.username)
 
-    if not existing_user:
+    if (not existing_user) and (not existing_username):
         UserService(db).register(user)
         status_code=201
         content="User created successfully"

@@ -4,7 +4,7 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 
 from core.database import Session
-from publications.schemas.publication import Publication, PublicationInDb
+from publications.schemas.publication import Publication, PublicationInDb, PublicationResponse
 from publications.service import PublicationService
 from users.schemas.user import User
 from users.service import auth
@@ -16,7 +16,7 @@ publication_router.tags = ["publications"]
 
 
 
-@publication_router.get('/', status_code=200, response_model=List[Publication])
+@publication_router.get('/', status_code=200, response_model=List[PublicationResponse])
 def get_publications():
     db = Session()
     result = PublicationService(db).get_publications()

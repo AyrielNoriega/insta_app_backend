@@ -1,5 +1,8 @@
+from fastapi.encoders import jsonable_encoder
+from sqlalchemy.orm import joinedload
+
 from publications.models.publication import Publication as PublicationModel
-from publications.schemas.publication import Publication
+from publications.schemas.publication import Publication, PublicationResponse
 from users.schemas.user import User
 
 class PublicationService():
@@ -8,8 +11,22 @@ class PublicationService():
 
 
     def get_publications(self):
-        result = self.db.query(PublicationModel).all()
-        return result
+        # result = self.db.query(PublicationModel).all()
+        #realizar una consulta a relacion de usuario
+        result = (
+            self.db.query(PublicationModel)
+            .options(joinedload(PublicationModel.user))
+            .all()
+        )
+        publications = []
+        for publication in result:
+            p = PublicationResponse(
+                **jsonable_encoder(publication),
+                author=publication.user.name
+            )
+            publications.append(p)
+
+        return publications
 
 
     def get_publication_by_id(self, id: int):

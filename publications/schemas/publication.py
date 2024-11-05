@@ -23,3 +23,22 @@ class PublicationInDb(Publication):
     created_at: str
     updated_at: str
 
+
+class PublicationResponse(Publication):
+    id: int
+    author: str
+    created_at: str
+
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "id": 1,
+                    "title": "My first publication",
+                    "content": "This is the content of my first publication",
+                    "created_at": "2021-10-20T00:00:00",
+                    "author": "Ayriel Noriega"
+                }
+            ]
+        }
+    }
