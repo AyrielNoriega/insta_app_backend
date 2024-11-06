@@ -18,7 +18,4 @@ COPY . .
 
 EXPOSE 8000
 
-# CMD ["fastapi", "run", "app/main.py", "--reload", "--host", "0.0.0.0", "--port", "8000"]
-
-CMD ["fastapi", "run", "app/main.py", "--port", "80"]
-# CMD ["sh", "-c", ". venv/bin/activate && uvicorn main:app --host 0.0.0.0 --port 8000 --reload"]
+CMD ["fastapi", "run", "main.py", "--reload", "--host", "0.0.0.0", "--port", "8000"]
